@@ -10,8 +10,16 @@ import (
 	"syscall"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
 )
+
+// ContainerOptions
+type ContainerOptions struct {
+	Image        string
+	ImageVersion string
+	Cmd          strslice.StrSlice
+}
 
 // GetFilePath
 func GetFilePath(dir string, filename string) string {

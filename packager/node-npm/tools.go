@@ -14,7 +14,14 @@ import (
 	"github.com/nlevee/uniq-package-manager/packager/tools"
 )
 
-func createDockerWrapper(packagePath string, cmd strslice.StrSlice) {
+func newDefaultOptions() tools.ContainerOptions {
+	return tools.ContainerOptions{
+		Image:        "docker.io/library/node",
+		ImageVersion: "lts",
+	}
+}
+
+func createDockerWrapper(packagePath string, opts tools.ContainerOptions) {
 	ctx := context.Background()
 	user, _ := user.Current()
 
@@ -24,7 +31,7 @@ func createDockerWrapper(packagePath string, cmd strslice.StrSlice) {
 	}
 
 	// pull image
-	dockerImage := "docker.io/library/node:dubnium"
+	dockerImage := opts.Image + ":" + opts.ImageVersion
 	tools.ImagePull(cli, dockerImage)
 
 	// creation du conteneur pour php-package
@@ -35,7 +42,7 @@ func createDockerWrapper(packagePath string, cmd strslice.StrSlice) {
 		AttachStdout: true,
 		AttachStderr: true,
 		Entrypoint:   strslice.StrSlice{"/usr/local/bin/npm"},
-		Cmd:          cmd,
+		Cmd:          opts.Cmd,
 		WorkingDir:   "/app",
 	}, &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "no"},

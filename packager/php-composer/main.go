@@ -7,13 +7,33 @@ import (
 
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/nlevee/uniq-package-manager/packager/tools"
+	"github.com/spf13/viper"
 )
 
-type PhpComposer struct{}
+type PhpComposer struct {
+	ContainerOpts tools.ContainerOptions
+}
+
+// NewPhpComposer load viper parameters to ContainerOpts struct
+func NewPhpComposer(config *viper.Viper) PhpComposer {
+	c := PhpComposer{
+		ContainerOpts: newDefaultOptions(),
+	}
+
+	if image := config.GetString("php-composer.image"); image != "" {
+		c.ContainerOpts.Image = image
+	}
+
+	if version := config.GetString("php-composer.version"); version != "" {
+		c.ContainerOpts.ImageVersion = version
+	}
+
+	return c
+}
 
 func (c PhpComposer) Update(path string) {
 	if composerFile := HasComposer(path); composerFile != "" {
-		if err := ComposerUpdate(composerFile); err != nil {
+		if err := ComposerUpdate(composerFile, c.ContainerOpts); err != nil {
 			panic(err)
 		}
 	}
@@ -21,7 +41,7 @@ func (c PhpComposer) Update(path string) {
 
 func (c PhpComposer) Install(path string) {
 	if composerFile := HasComposer(path); composerFile != "" {
-		if err := ComposerInstall(composerFile); err != nil {
+		if err := ComposerInstall(composerFile, c.ContainerOpts); err != nil {
 			panic(err)
 		}
 	}
@@ -38,7 +58,7 @@ func HasComposerLock(dir string) string {
 }
 
 // ComposerInstall must be use to install package using composer
-func ComposerInstall(composerFile string) error {
+func ComposerInstall(composerFile string, opts tools.ContainerOptions) error {
 	composerPath := path.Dir(composerFile)
 	fmt.Println("composer install :", composerFile, "in context", composerPath)
 
@@ -47,15 +67,17 @@ func ComposerInstall(composerFile string) error {
 		os.Exit(1)
 	}
 
-	createDockerWrapper(composerPath, strslice.StrSlice{"install", "--no-scripts", "--no-progress"})
+	opts.Cmd = strslice.StrSlice{"install", "--no-scripts", "--no-progress"}
+	createDockerWrapper(composerPath, opts)
 	return nil
 }
 
 // ComposerUpdate must be use to update package using composer
-func ComposerUpdate(composerFile string) error {
+func ComposerUpdate(composerFile string, opts tools.ContainerOptions) error {
 	composerPath := path.Dir(composerFile)
 	fmt.Println("composer update :", composerFile, "in context", composerPath)
 
-	createDockerWrapper(composerPath, strslice.StrSlice{"update", "--no-scripts", "--no-progress"})
+	opts.Cmd = strslice.StrSlice{"update", "--no-scripts", "--no-progress"}
+	createDockerWrapper(composerPath, opts)
 	return nil
 }

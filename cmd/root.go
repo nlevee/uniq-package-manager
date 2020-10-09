@@ -55,8 +55,18 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.udm.yaml)")
 	rootCmd.PersistentFlags().StringP("app-base-path", "a", "", "Application base path")
 
+	rootCmd.PersistentFlags().String("node-image", "docker.io/library/node", "Node image for node container")
+	rootCmd.PersistentFlags().String("node-version", "lts", "Node version for node container")
+
+	rootCmd.PersistentFlags().String("php-composer-version", "1.10", "container version for php-composer package manager")
+	rootCmd.PersistentFlags().String("php-composer-image", "docker.io/library/composer", "container image for php-composer package manager")
+
 	// binding config from config file
 	viper.BindPFlag("appBasePath", rootCmd.PersistentFlags().Lookup("app-base-path"))
+	viper.BindPFlag("node.version", rootCmd.PersistentFlags().Lookup("node-version"))
+	viper.BindPFlag("node.image", rootCmd.PersistentFlags().Lookup("node-image"))
+	viper.BindPFlag("php-composer.version", rootCmd.PersistentFlags().Lookup("php-composer-version"))
+	viper.BindPFlag("php-composer.image", rootCmd.PersistentFlags().Lookup("php-composer-image"))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

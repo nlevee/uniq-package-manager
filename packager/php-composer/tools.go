@@ -16,7 +16,14 @@ import (
 	"github.com/nlevee/uniq-package-manager/packager/tools"
 )
 
-func createDockerWrapper(composerPath string, cmd strslice.StrSlice) {
+func newDefaultOptions() tools.ContainerOptions {
+	return tools.ContainerOptions{
+		Image:        "docker.io/library/composer",
+		ImageVersion: "latest",
+	}
+}
+
+func createDockerWrapper(composerPath string, opts tools.ContainerOptions) {
 	ctx := context.Background()
 	user, _ := user.Current()
 
@@ -30,7 +37,7 @@ func createDockerWrapper(composerPath string, cmd strslice.StrSlice) {
 		panic(err)
 	}
 
-	dockerImage := "docker.io/library/composer:1.10"
+	dockerImage := opts.Image + ":" + opts.ImageVersion
 	tools.ImagePull(cli, dockerImage)
 
 	// creation du conteneur pour php-composer
@@ -41,7 +48,7 @@ func createDockerWrapper(composerPath string, cmd strslice.StrSlice) {
 		AttachStdout: true,
 		AttachStderr: true,
 		Entrypoint:   strslice.StrSlice{"/usr/bin/composer", "-n"},
-		Cmd:          cmd,
+		Cmd:          opts.Cmd,
 	}, &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{Name: "no"},
 		Mounts: []mount.Mount{
