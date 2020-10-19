@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nlevee/uniq-package-manager/packager"
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -28,6 +29,9 @@ import (
 )
 
 var cfgFile string
+
+// list package handlers
+var packagerHandlers = packager.NewPackagerList(viper.GetViper())
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -58,10 +62,10 @@ func init() {
 	rootCmd.PersistentFlags().String("node-image", "docker.io/library/node", "Node image for node container")
 	rootCmd.PersistentFlags().String("node-version", "lts", "Node version for node container")
 
-	rootCmd.PersistentFlags().String("php-composer-version", "1.10", "container version for php-composer package manager")
 	rootCmd.PersistentFlags().String("php-composer-image", "docker.io/library/composer", "container image for php-composer package manager")
+	rootCmd.PersistentFlags().String("php-composer-version", "1.10", "container version for php-composer package manager")
 
-	// binding config from config file
+	// Binding config from config file
 	viper.BindPFlag("appBasePath", rootCmd.PersistentFlags().Lookup("app-base-path"))
 	viper.BindPFlag("node.version", rootCmd.PersistentFlags().Lookup("node-version"))
 	viper.BindPFlag("node.image", rootCmd.PersistentFlags().Lookup("node-image"))
