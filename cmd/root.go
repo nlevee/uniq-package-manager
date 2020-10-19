@@ -52,7 +52,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.udm.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.upm.yaml)")
 	rootCmd.PersistentFlags().StringP("app-base-path", "a", "", "Application base path")
 
 	rootCmd.PersistentFlags().String("node-image", "docker.io/library/node", "Node image for node container")
@@ -86,9 +86,9 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".udm" (without extension).
+		// Search config in home directory with name ".upm" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".udm")
+		viper.SetConfigName(".upm")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

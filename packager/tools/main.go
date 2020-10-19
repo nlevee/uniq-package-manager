@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -38,6 +39,25 @@ func CleanContainer(cli *client.Client, containerID string) {
 	cli.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{
 		Force: true,
 	})
+}
+
+// ShowContainerLog output all container log
+func ShowContainerLog(cli *client.Client, containerID string) {
+	ctx := context.Background()
+	out, err := cli.ContainerLogs(ctx, containerID, types.ContainerLogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Follow:     true,
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer out.Close()
+
+	scanner := bufio.NewScanner(out)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
 }
 
 // SetupEndHandler

@@ -47,7 +47,7 @@ var installCmd = &cobra.Command{
 			basepath, _ = filepath.Abs(basepath)
 		}
 
-		handlers := packager.NewPackagerList()
+		handlers := packager.NewPackagerList(viper.GetViper())
 
 		jobGrp := sync.WaitGroup{}
 		for _, h := range handlers {

@@ -13,10 +13,10 @@ type PackageHandler interface {
 }
 
 // NewPackagerList make a new slice with packages
-func NewPackagerList() []PackageHandler {
+func NewPackagerList(config *viper.Viper) []PackageHandler {
 	handlers := []PackageHandler{
-		gocomposer.NewPhpComposer(viper.GetViper()),
-		gonpm.NewNodeNpm(viper.GetViper()),
+		gocomposer.NewPhpComposer(config),
+		gonpm.NewNodeNpm(config),
 	}
 	return handlers
 }

@@ -1,7 +1,6 @@
 package gocomposer
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"os/user"
@@ -81,21 +80,9 @@ func createDockerWrapper(composerPath string, opts tools.ContainerOptions) {
 	}
 
 	// Show container logs
-	out, err := cli.ContainerLogs(ctx, container.ID, types.ContainerLogsOptions{
-		ShowStdout: true,
-		ShowStderr: true,
-		Follow:     true,
-	})
-	if err != nil {
-		panic(err)
-	}
-	defer out.Close()
+	tools.ShowContainerLog(cli, container.ID)
 
-	scanner := bufio.NewScanner(out)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-	}
-
+	// wait for container end
 	fmt.Println("wait for container", container.ID)
 	if _, err := cli.ContainerWait(ctx, container.ID); err != nil {
 		panic(err)
